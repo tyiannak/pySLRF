@@ -47,26 +47,26 @@ def flags2segs(Flags, window):
 
 def preProcess(angleRange, Scan):
 	Scan = numpy.array(Scan)
-	Scan = scipy.signal.medfilt(Scan, 5)
-	Scan = scipy.signal.medfilt(Scan, 3)
+	Scan = scipy.signal.medfilt(Scan, 11)
+	Scan = scipy.signal.medfilt(Scan, 13)
 	
 	#f = scipy.interpolate.interp1d(angleRange, Scan, kind='cubic')
 	
 	I = Scan==0
 			
 	segs, classes = flags2segs(I, 1)
-	Scan2 = numpy.copy(Scan)
+	Scan2 = numpy.copy(Scan)	
 	for i in range(1, segs.shape[0]-1):
 		if classes[i]:	
 			a1 = angleRange[segs[i-1,0]:segs[i-1,1]]
 			a2 = angleRange[segs[i+1,0]:segs[i+1,1]]
-			a1 = a1[-3::]
-			a2 = a2[0:3]
+			a1 = a1[-1::]
+			a2 = a2[0:1]
 			A = numpy.concatenate((a1, a2))
 			b1 = Scan[segs[i-1,0]:segs[i-1,1]]
 			b2 = Scan[segs[i+1,0]:segs[i+1,1]]
-			b1 = b1[-3::]
-			b2 = b2[0:3]
+			b1 = b1[-1::]
+			b2 = b2[0:1]
 			B = numpy.concatenate((b1, b2))
 			#f = scipy.interpolate.interp1d(A, B, kind='cubic')		
 			f = scipy.interpolate.interp1d(A, B)
@@ -80,7 +80,7 @@ count = 0
 
 angleRange = numpy.arange(-120, 120, 0.352)
 print angleRange.shape
-
+plt.figure(figsize=(6*3.13,4*3.13))
 while True:
 	count += 1
 	Scan = laser.getScan()		
@@ -93,7 +93,7 @@ while True:
 	Y2 = numpy.sin(numpy.deg2rad(angleRange)) * Scan2
 
 	
-	plt.clf()
+	plt.clf()	
 	plt.subplot(1,3,1)
 	plt.plot(angleRange, Scan)
 	plt.plot(angleRange, Scan2, 'r')
